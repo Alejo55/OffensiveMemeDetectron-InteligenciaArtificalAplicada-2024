@@ -1,4 +1,4 @@
-const useMockedBackend = false;  
+const useMockedBackend = false;
 
 chrome.action.onClicked.addListener((tab) => {
     // Inject contentScript.js into the active tab
@@ -76,6 +76,69 @@ function showNotification(title, message) {
         message: message
     });
 }
+
+function createReanalyzeNotification(data) {
+    // Generate a unique notification ID
+    const notificationId = 'reanalyze-' + Date.now();
+
+    // Store the data associated with this notification
+    pendingNotifications[notificationId] = data;
+
+    chrome.notifications.create(notificationId, {
+        type: 'basic',
+        iconUrl: 'icon.png', // Path to your extension's icon
+        title: 'Image Already Analyzed',
+        message: data.message + ' Do you want to re-analyze it?',
+        buttons: [
+            { title: 'Yes! Re-analyze' },
+            { title: 'No' }
+        ],
+        priority: 0
+    });
+}
+
+// Object to keep track of pending notifications and their associated data
+const pendingNotifications = {};
+
+chrome.notifications.onButtonClicked.addListener(function (notificationId, buttonIndex) {
+    if (notificationId.startsWith('reanalyze-')) {
+        const data = pendingNotifications[notificationId];
+        if (data) {
+            if (buttonIndex === 0) {
+                // User clicked 'Re-analyze'
+                fetch('http://127.0.0.1:5000/process-meme', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 'image': data.image, 're_analyze': true })
+                })
+                    .then(response => response.json())
+                    .then(resultData => {
+                        // Handle the new result
+                        showNotification('New Analysis Result', resultData.result);
+                        // Remove the notification data
+                        delete pendingNotifications[notificationId];
+                        // Clear the notification
+                        chrome.notifications.clear(notificationId);
+                    });
+            } else if (buttonIndex === 1) {
+                // User clicked 'Use Existing Result'
+                showNotification('Existing Analysis Result', data.result);
+                // Remove the notification data
+                delete pendingNotifications[notificationId];
+                // Clear the notification
+                chrome.notifications.clear(notificationId);
+            }
+        }
+    }
+});
+
+// Optional: Handle when the notification is closed
+chrome.notifications.onClosed.addListener(function (notificationId, byUser) {
+    if (pendingNotifications[notificationId]) {
+        delete pendingNotifications[notificationId];
+    }
+});
+
 
 // Mocked backend response function
 function mockBackendResponse(base64Image) {

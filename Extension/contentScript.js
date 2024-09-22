@@ -1,6 +1,6 @@
 {
     // Fetch the first image on the page
-    let imageElement = document.querySelector('img');
+    let imageElement = document.querySelector('[id="post-image"]');
 
     if (imageElement) {
         let imageUrl = imageElement.src;
@@ -12,4 +12,5 @@
     } else {
         alert("No image found on the page.");
     }
+
 }
