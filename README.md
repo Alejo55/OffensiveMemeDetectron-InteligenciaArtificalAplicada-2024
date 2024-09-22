@@ -1,5 +1,7 @@
 # offensive-meme-detectron
 
+![](Extension/POGE-main.png)
+
 Proyecto para la materia Inteligencia Artificial Aplicada de la Universidad Nacional de La Matanza.
 
 ---
