@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Offensive meme detectron",
+    "version": "1.0",
+    "permissions": [
+        "activeTab",
+        "storage",
+        "scripting",
+        "notifications"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_icon": "POGE.png",
+        "default_popup": "popup.html"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
