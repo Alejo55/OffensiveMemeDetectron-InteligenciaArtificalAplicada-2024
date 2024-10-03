@@ -1,0 +1,30 @@
+/* styles.css */
+
+/* Body styles */
+body {
+    background-color: #f7fafc; /* Equivalent to Tailwind's bg-gray-100 */
+    font-family: sans-serif;
+    padding: 1.25rem; /* Equivalent to Tailwind's p-5 */
+}
+
+/* Heading styles */
+h1 {
+    font-size: 1.5rem; /* Equivalent to Tailwind's text-2xl */
+    color: #2d3748; /* Equivalent to Tailwind's text-gray-800 */
+    margin-bottom: 1.25rem; /* Equivalent to Tailwind's mb-5 */
+}
+
+/* Button styles */
+#fetchButton {
+    background-color: #4299e1; /* Tailwind's bg-blue-500 */
+    color: white;
+    font-weight: 500; /* Tailwind's font-medium */
+    padding: 0.5rem 1rem; /* Tailwind's py-2 px-4 */
+    border-radius: 0.25rem; /* Tailwind's rounded */
+    border: none;
+    cursor: pointer;
+}
+
+#fetchButton:hover {
+    background-color: #3182ce; /* Tailwind's bg-blue-600 */
+}

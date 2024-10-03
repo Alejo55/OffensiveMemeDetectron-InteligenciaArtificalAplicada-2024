@@ -1,6 +1,6 @@
 {
     // Fetch the first image on the page
-    let imageElement = document.querySelector('[id="post-image"]');
+    let imageElement = document.querySelector('[alt="Image"]');
 
     if (imageElement) {
         let imageUrl = imageElement.src;

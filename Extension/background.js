@@ -53,12 +53,17 @@ function processMemeImage(base64Image) {
     })
         .then(response => response.json())
         .then(data => {
+
+            if (data.re_analyze) {   // Check if the image has already been analyzed 
+                createReanalyzeNotification({ image: base64Image, message: 'This meme has already been analyzed.' });
+                return;
+            }   
+
             // Show a notification with the result
             showNotification('Meme Analysis Result', 'The meme is ' + data.result);
         })
         .catch(error => {
-            console.error('Error:', error);
-            showNotification('Error processing image');
+            showNotification('Error processing image', error.message);
         });
 }
 
@@ -86,7 +91,7 @@ function createReanalyzeNotification(data) {
 
     chrome.notifications.create(notificationId, {
         type: 'basic',
-        iconUrl: 'icon.png', // Path to your extension's icon
+        iconUrl: 'POGE-main.png', // Path to your extension's icon
         title: 'Image Already Analyzed',
         message: data.message + ' Do you want to re-analyze it?',
         buttons: [
