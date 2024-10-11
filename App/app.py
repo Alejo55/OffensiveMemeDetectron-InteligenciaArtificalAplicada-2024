@@ -7,24 +7,75 @@ import io
 import gradio as gr
 import threading
 import hashlib
+import torch
+import pytesseract
+import easyocr
+# Import model components from model.py
+from model import preprocess_image, preprocess_text , bert_model, resnet_model, additional_layers   
 
 app = Flask(__name__)
 
-useMock = True
+useMock = False
 # In-memory dictionary for storing images and results
 stored_data = {}
 
+# Initialize the OCR reader with the languages you need (e.g., English)
+reader = easyocr.Reader(['en'])
+
+# Create a threading lock for model predictions
+model_lock = threading.Lock()
+
 # Mock function for processing
 def mock_process_image(img):
-    prediction = random.choice(['offensive', 'not offensive', 'not sure'])
+    prediction = random.choice(['offensive', 'not offensive'])
     return prediction
 
 # Function for processing meme
 def process_image(img):
-    #
-    # TODO: Replace with real processing logic AI/ML model
-    #
-    prediction = "Real prediction result"
+    # Preprocess the image
+    image_tensor = preprocess_image(img)  # Shape: (1, 3, 224, 224)
+
+    # Extract text from the image using EasyOCR
+    result = reader.readtext(img)
+
+    # Combine all extracted text into a single string for simplicity
+    extracted_text = ' '.join([text for (_, text, _) in result])
+
+    print(extracted_text)
+
+    # If no text is extracted, you can assign a default value or handle accordingly
+    if not extracted_text.strip():
+        extracted_text = ' '  # Or any default text you prefer Assign empty
+
+    # Preprocess the extracted text
+    input_ids, attention_mask = preprocess_text(extracted_text)  # Shapes: (1, max_length)
+
+    with model_lock:
+        bert_model.eval()
+        resnet_model.eval()
+        additional_layers.eval()
+
+        with torch.no_grad():
+            # Process text with DistilBERT
+            text_output = bert_model(input_ids=input_ids, attention_mask=attention_mask)
+            text_embedding = text_output.last_hidden_state[:, 0, :]  # Shape: (1, 768)
+
+            # Process image with ResNet50
+            image_embedding = resnet_model(image_tensor)  # Shape: (1, 2048)
+
+            # Combine embeddings
+            combined_output = torch.cat((text_embedding, image_embedding), dim=1)  # Shape: (1, 2816)
+
+            # Pass through additional layers
+            logits = additional_layers(combined_output).squeeze()  # Shape: (1,)
+
+            # Apply sigmoid to get probability
+            probability = torch.sigmoid(logits).item()
+            print(f"Probability: {probability}")
+
+    # Determine the prediction based on a threshold
+    prediction = 'offensive' if probability >= 0.012 else 'not offensive'
+
     return prediction
 
 # Route for processing with real data
@@ -50,6 +101,7 @@ def process_meme():
     else:
         # Proceed with processing
         if useMock:
+            print("Using Mock")
             prediction = mock_process_image(img)
         else:
             prediction = process_image(img)
@@ -145,7 +197,7 @@ def run_app():
 
     # Launch Gradio interface
     demo = create_gradio_interface()
-    demo.launch(server_port=7860, share=True)
+    demo.launch(server_port=7865, share=True)
 
 if __name__ == '__main__':
     run_app()

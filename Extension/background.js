@@ -69,14 +69,14 @@ function processMemeImage(base64Image) {
 
 // Function to show a Chrome notification
 function showNotification(title, message) {
-    var icon = 'POGE.png';
-    if (message === "offensive") {
+    var icon = 'POGE-main.png';
+    if (message === "The meme is offensive") {
         icon = 'POGE-angry.png';
     }
 
     chrome.notifications.create({
         type: 'basic',
-        iconUrl: 'POGE-angry.png',  // Path to your extension icon
+        iconUrl: icon, 
         title: title,
         message: message
     });
