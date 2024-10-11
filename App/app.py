@@ -43,7 +43,7 @@ def process_image(img):
 
     # Combine all extracted text into a single string for simplicity
     extracted_text = ' '.join([text for (_, text, _) in result])
-    print(extracted_text)
+    #print(extracted_text)
 
     # If no text is extracted, you can assign a default value or handle accordingly
     if not extracted_text.strip():
@@ -73,7 +73,7 @@ def process_image(img):
 
             # Apply sigmoid to get probability
             probability = torch.sigmoid(logits).item()
-            print(f"Probability: {probability}")
+            #print(f"Probability: {probability}")
 
     # Determine the prediction based on a threshold
     prediction = 'offensive' if probability >= 0.5 else 'not offensive'
