@@ -8,8 +8,6 @@ Proyecto para la materia Inteligencia Artificial Aplicada de la Universidad Naci
 
 ## Instrucciones
 
-TO DO
-
 1. Ingresar o crear un venv de python.
 https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments
 
@@ -21,6 +19,15 @@ source .venv/bin/activate
 ```
 pip install -r requirements.txt
 
+```
+Descargar `gdown` y el modelo:
+```
+make setup
+```
+
+Si solo quiere descargar el modelo (`gdown` ya se encuentra instalado), ejecutar:
+```
+make download_model
 ```
 
 3. Ejecutar el programa
