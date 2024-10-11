@@ -10,6 +10,7 @@ import hashlib
 import torch
 import pytesseract
 import easyocr
+import numpy as np
 # Import model components from model.py
 from model import preprocess_image, preprocess_text , bert_model, resnet_model, additional_layers   
 
@@ -35,12 +36,13 @@ def process_image(img):
     # Preprocess the image
     image_tensor = preprocess_image(img)  # Shape: (1, 3, 224, 224)
 
+    # Convert PIL Image to a NumPy array
+    image_np = np.array(img)
     # Extract text from the image using EasyOCR
-    result = reader.readtext(img)
+    result = reader.readtext(image_np)
 
     # Combine all extracted text into a single string for simplicity
     extracted_text = ' '.join([text for (_, text, _) in result])
-
     print(extracted_text)
 
     # If no text is extracted, you can assign a default value or handle accordingly
