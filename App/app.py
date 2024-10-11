@@ -76,7 +76,7 @@ def process_image(img):
             print(f"Probability: {probability}")
 
     # Determine the prediction based on a threshold
-    prediction = 'offensive' if probability >= 0.012 else 'not offensive'
+    prediction = 'offensive' if probability >= 0.5 else 'not offensive'
 
     return prediction
 
