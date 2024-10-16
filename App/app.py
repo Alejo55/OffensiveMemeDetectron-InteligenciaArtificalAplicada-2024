@@ -33,6 +33,8 @@ def mock_process_image(img):
 
 # Function for processing meme
 def process_image(img):
+    text_weight = 0.8
+    image_weight = 0.2
     # Preprocess the image
     image_tensor = preprocess_image(img)  # Shape: (1, 3, 224, 224)
 
@@ -43,11 +45,11 @@ def process_image(img):
 
     # Combine all extracted text into a single string for simplicity
     extracted_text = ' '.join([text for (_, text, _) in result])
-    #print(extracted_text)
+    print(extracted_text)
 
-    # If no text is extracted, you can assign a default value or handle accordingly
+    # If no text is extracted, assign a default value 
     if not extracted_text.strip():
-        extracted_text = ' '  # Or any default text you prefer Assign empty
+        extracted_text = ' '  # assign empty
 
     # Preprocess the extracted text
     input_ids, attention_mask = preprocess_text(extracted_text)  # Shapes: (1, max_length)
@@ -65,18 +67,22 @@ def process_image(img):
             # Process image with ResNet50
             image_embedding = resnet_model(image_tensor)  # Shape: (1, 2048)
 
+            # Apply weights to embeddings
+            weighted_text_embedding = text_weight * text_embedding
+            weighted_image_embedding = image_weight * image_embedding
+
             # Combine embeddings
-            combined_output = torch.cat((text_embedding, image_embedding), dim=1)  # Shape: (1, 2816)
+            combined_output = torch.cat((weighted_text_embedding, weighted_image_embedding), dim=1)  # Shape: (1, 2816)
 
             # Pass through additional layers
             logits = additional_layers(combined_output).squeeze()  # Shape: (1,)
 
             # Apply sigmoid to get probability
             probability = torch.sigmoid(logits).item()
-            #print(f"Probability: {probability}")
+            print(f"Probability: {probability}")
 
     # Determine the prediction based on a threshold
-    prediction = 'offensive' if probability >= 0.5 else 'not offensive'
+    prediction = 'offensive' if probability >= 0.19 else 'not offensive'
 
     return prediction
 

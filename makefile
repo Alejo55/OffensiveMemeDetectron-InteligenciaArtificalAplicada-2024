@@ -1,5 +1,5 @@
-FILE_ID = 1fPo9JRoLk1MI5fYeB6y7DDi2sl3dBswk
-OUTPUT = multimodal_model_offensive_meme_v2.pth
+FILE_ID = 1iVrGxIhVfXsyRFCshMUNLZn7kXjMRNXM
+OUTPUT = multimodal_model_offensive_meme_v3.pth
 
 # Target to install the dependencies, including gdown
 install:
