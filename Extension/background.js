@@ -57,7 +57,7 @@ function processMemeImage(base64Image) {
             if (data.re_analyze) {   // Check if the image has already been analyzed 
                 createReanalyzeNotification({ image: base64Image, message: 'This meme has already been analyzed.' });
                 return;
-            }   
+            }
 
             // Show a notification with the result
             showNotification('Meme Analysis Result', 'The meme is ' + data.result);
@@ -76,7 +76,7 @@ function showNotification(title, message) {
 
     chrome.notifications.create({
         type: 'basic',
-        iconUrl: icon, 
+        iconUrl: icon,
         title: title,
         message: message
     });
@@ -119,7 +119,7 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, butto
                     .then(response => response.json())
                     .then(resultData => {
                         // Handle the new result
-                        showNotification('New Analysis Result', resultData.result);
+                        showNotification('New Analysis Result', 'The meme is ' + resultData.result);
                         // Remove the notification data
                         delete pendingNotifications[notificationId];
                         // Clear the notification
@@ -127,11 +127,20 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, butto
                     });
             } else if (buttonIndex === 1) {
                 // User clicked 'Use Existing Result'
-                showNotification('Existing Analysis Result', data.result);
-                // Remove the notification data
-                delete pendingNotifications[notificationId];
-                // Clear the notification
-                chrome.notifications.clear(notificationId);
+                fetch('http://127.0.0.1:5000/process-meme', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 'image': data.image, 're_analyze': false })
+                })
+                    .then(response => response.json())
+                    .then(resultData => {
+                        // Handle the new result
+                        showNotification('Existing Analysis Result', 'The meme is ' + resultData.result);
+                        // Remove the notification data
+                        delete pendingNotifications[notificationId];
+                        // Clear the notification
+                        chrome.notifications.clear(notificationId);
+                    });
             }
         }
     }
