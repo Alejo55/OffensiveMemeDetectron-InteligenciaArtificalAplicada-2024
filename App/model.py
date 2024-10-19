@@ -39,9 +39,9 @@ bert_model, resnet_model, additional_layers = build_multimodal_model()
 
 # Load the saved state dictionaries
 print(os.getcwd())
-checkpoint = torch.load('multimodal_model_offensive_meme_v2.pth', map_location=torch.device('cpu'))
+checkpoint = torch.load('multimodal_model_complete.pth', map_location=torch.device('cpu'))
 
-bert_model.load_state_dict(checkpoint['bert_model'])
+bert_model.load_state_dict(checkpoint['db_model'])
 resnet_model.load_state_dict(checkpoint['resnet_model'])
 additional_layers.load_state_dict(checkpoint['add_layers'])
 
