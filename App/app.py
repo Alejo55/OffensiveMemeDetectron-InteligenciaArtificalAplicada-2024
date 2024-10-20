@@ -20,7 +20,7 @@ useMock = False
 # In-memory dictionary for storing images and results
 stored_data = {}
 
-# Initialize the OCR reader with the languages you need (e.g., English)
+# Initialize the OCR reader in English
 reader = easyocr.Reader(['en'])
 
 # Create a threading lock for model predictions
@@ -36,7 +36,7 @@ def process_image(img):
     text_weight = 0.8
     image_weight = 0.2
     # Preprocess the image
-    image_tensor = preprocess_image(img)  # Shape: (1, 3, 224, 224)
+    image_tensor = preprocess_image(img)
 
     # Convert PIL Image to a NumPy array
     image_np = np.array(img)
@@ -47,12 +47,12 @@ def process_image(img):
     extracted_text = ' '.join([text for (_, text, _) in result])
     print(extracted_text)
 
-    # If no text is extracted, assign a default value 
+    # If no text is extracted, we assign a default value empty string
     if not extracted_text.strip():
-        extracted_text = ' '  # assign empty
+        extracted_text = ' ' 
 
     # Preprocess the extracted text
-    input_ids, attention_mask = preprocess_text(extracted_text)  # Shapes: (1, max_length)
+    input_ids, attention_mask = preprocess_text(extracted_text)
 
     with model_lock:
         bert_model.eval()
@@ -62,27 +62,27 @@ def process_image(img):
         with torch.no_grad():
             # Process text with DistilBERT
             text_output = bert_model(input_ids=input_ids, attention_mask=attention_mask)
-            text_embedding = text_output.last_hidden_state[:, 0, :]  # Shape: (1, 768)
+            text_embedding = text_output.last_hidden_state[:, 0, :] 
 
             # Process image with ResNet50
-            image_embedding = resnet_model(image_tensor)  # Shape: (1, 2048)
+            image_embedding = resnet_model(image_tensor)  
 
             # Apply weights to embeddings
             weighted_text_embedding = text_weight * text_embedding
             weighted_image_embedding = image_weight * image_embedding
 
             # Combine embeddings
-            combined_output = torch.cat((weighted_text_embedding, weighted_image_embedding), dim=1)  # Shape: (1, 2816)
+            combined_output = torch.cat((weighted_text_embedding, weighted_image_embedding), dim=1)  
 
             # Pass through additional layers
-            logits = additional_layers(combined_output).squeeze()  # Shape: (1,)
+            logits = additional_layers(combined_output).squeeze() 
 
             # Apply sigmoid to get probability
             probability = torch.sigmoid(logits).item()
             print(f"Probability: {probability}")
 
     # Determine the prediction based on a threshold
-    prediction = 'offensive' if probability >= 0.19 else 'not offensive'
+    prediction = 'offensive' if probability >= 0.029 else 'not offensive'
 
     return prediction
 
@@ -189,9 +189,6 @@ def create_gradio_interface():
             gr.Markdown("# Meme Moderation Gallery")
             gallery = gr.Gallery(label="Processed Memes", columns=3, height='auto', value=show_gallery())
             refresh_button = gr.Button("Refresh")
-
-            # Set initial gallery state
-            #gallery.update(value=show_gallery())
 
             # Refresh action
             refresh_button.click(refresh_gallery, outputs=gallery)
